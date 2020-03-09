@@ -25,7 +25,7 @@ exports.setAddress = async(type, address, overwrite = false) => {
         if (!details.accounts) details.accounts = default_coin.accounts;
 
         //Check if accounts exist if not create empty array and fill it.
-        // TODO add address if not set or overwrite when flag overwrite is set
+        // TODO add address if not set or overwrite when flag overwrite is set, dont need the flag when address is x
         if (!details.accounts[type]) details.accounts[type] = address;
 
         // Check for error
@@ -38,7 +38,6 @@ exports.setAddress = async(type, address, overwrite = false) => {
     } catch (err) {
         return { error: err }
     }
-
 };
 
 exports.getDetails = async() => {
@@ -56,6 +55,7 @@ exports.getDetails = async() => {
 
 exports.setDetails = async() => {
     //TODO Set details from API
+    // NOTE idea: not an actual url but flag on getDetails? so run this when flag is set?
 };
 
 
@@ -65,4 +65,5 @@ exports.getTransactions = () => {
 
 exports.setTransactions = () => {
     //TODO Set transactions from API
+    // NOTE if transaction confirmed count is not equal to previous after account check run this. 
 };
