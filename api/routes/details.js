@@ -1,8 +1,8 @@
 const router = require('express').Router();
 
-const DetailsController = require('../controllers/details');
+const CoreController = require('../controllers/Core');
 
-router.get('/', DetailsController.getDetails);
-router.post('/:type/:coin', DetailsController.updateDetails);
+router.get('/', CoreController.getDetails);
+router.post('/:type/:coin', CoreController.updateDetails);
 
 module.exports = router;
