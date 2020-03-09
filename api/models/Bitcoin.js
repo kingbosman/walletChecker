@@ -7,7 +7,11 @@ const details_file = './data/details/bitcoin.json';
 
 const default_coin = {
     name: "Bitcoin",
-    attr: "BTC"
+    attr: "BTC",
+    accounts: {
+        semicold: 'x',
+        deepcold: 'x'
+    }
 };
 
 exports.setAddress = async(type, address, overwrite = false) => {
@@ -18,10 +22,10 @@ exports.setAddress = async(type, address, overwrite = false) => {
         let details = await this.getDetails();
         if (!details.name) details.name = default_coin.name;
         if (!details.attr) details.attr = default_coin.attr;
+        if (!details.accounts) details.accounts = default_coin.accounts;
 
         //Check if accounts exist if not create empty array and fill it.
         // TODO add address if not set or overwrite when flag overwrite is set
-        if (!details.accounts) details.accounts = {};
         if (!details.accounts[type]) details.accounts[type] = address;
 
         // Check for error
