@@ -1,7 +1,10 @@
 const fs = require('fs');
 const fetch = require('node-fetch');
 
-
+/**
+ * @method GET /details
+ * @param {string} [coin] Optional query flag to return only specific coin
+ */
 exports.getDetails = async(req, res) => {
     try {
         let content = await fs.readFileSync(`./data/details.json`);
@@ -13,6 +16,12 @@ exports.getDetails = async(req, res) => {
     }
 };
 
+/**
+ * @method POST /details/{type}/{coin}
+ * @param type (semicold or deppcold)
+ * @param coin
+ * @result write to file and return written data
+ */
 exports.updateDetails = async(req, res) => {
     try {
 
@@ -28,18 +37,24 @@ exports.updateDetails = async(req, res) => {
 
         // Address throw when not set
         const address = details[req.params.coin].accounts[req.params.type].address;
-        if (!address) throw `Address not known for ${req.params.type}`
+        if (!address || address == 'x') throw `Address not known for ${req.params.type}`
 
+        // FIXME Start here -  import to BTC class
         // Get new details
         const url = details[req.params.coin].baseurl + address + '/balance';
         let response = await fetch(url);
         response = await response.json();
 
         // Overwrite old details and write to file
-        details[req.params.coin].accounts[req.params.type] = response;
-        fs.writeFileSync('./data/details.json', JSON.stringify(details));
+        details[req.params.coin].accounts[req.params.type].data = response;
+        details[req.params.coin].accounts[req.params.type].lastUpdated = new Date(Date.now()).toString();
+        await fs.writeFileSync('./data/details.json', JSON.stringify(details));
+        // FIXME end here and return for data, also create function for switching between coins
 
-        return res.json({ status: 'Writing in the background...' });
+        return res.json({
+            status: 'Completed',
+            data: details
+        });
     } catch (err) {
         res.status(400).json({ error: err });
     }
