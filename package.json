@@ -1,24 +1,24 @@
 {
-  "name": "walletChecker",
-  "version": "1.0.0",
-  "description": "Repository for checking wallet balances per wallet address and listen to incoming txs",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/kingbosman/walletChecker.git"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/kingbosman/walletChecker/issues"
-  },
-  "homepage": "https://github.com/kingbosman/walletChecker#readme",
-  "dependencies": {
-    "express": "^4.17.1",
-    "node-fetch": "^2.6.0"
-  }
+    "name": "walletChecker",
+    "version": "1.0.0",
+    "description": "Repository for checking wallet balances per wallet address and listen to incoming txs",
+    "main": "index.js",
+    "scripts": {
+        "start": "nodemon app.js"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/kingbosman/walletChecker.git"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "bugs": {
+        "url": "https://github.com/kingbosman/walletChecker/issues"
+    },
+    "homepage": "https://github.com/kingbosman/walletChecker#readme",
+    "dependencies": {
+        "express": "^4.17.1",
+        "node-fetch": "^2.6.0"
+    }
 }
