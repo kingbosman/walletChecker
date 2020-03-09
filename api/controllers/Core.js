@@ -1,5 +1,6 @@
 const fs = require('fs');
 const fetch = require('node-fetch');
+const BitcoinModel = require('../models/Bitcoin');
 
 /**
  * @method GET /details
@@ -25,6 +26,11 @@ exports.getDetails = async(req, res) => {
 exports.updateDetails = async(req, res) => {
     try {
 
+        // FIXME remove next text lines used for testing
+        test = BitcoinModel.setAddress('dev', 'address');
+        console.log(await test);
+        return res.end();
+
         // Get current details and manipulate the coin section
         let details = await fs.readFileSync('./data/details.json');
         details = JSON.parse(details);
@@ -35,11 +41,12 @@ exports.updateDetails = async(req, res) => {
         // Check JSON for the type
         if (!details[req.params.coin].accounts[req.params.type]) throw 'Account type is not known';
 
+        // FIXME Start here -  import to BTC class
         // Address throw when not set
         const address = details[req.params.coin].accounts[req.params.type].address;
         if (!address || address == 'x') throw `Address not known for ${req.params.type}`
 
-        // FIXME Start here -  import to BTC class
+
         // Get new details
         const url = details[req.params.coin].baseurl + address + '/balance';
         let response = await fetch(url);
@@ -47,9 +54,11 @@ exports.updateDetails = async(req, res) => {
 
         // Overwrite old details and write to file
         details[req.params.coin].accounts[req.params.type].data = response;
-        details[req.params.coin].accounts[req.params.type].lastUpdated = new Date(Date.now()).toString();
         await fs.writeFileSync('./data/details.json', JSON.stringify(details));
         // FIXME end here and return for data, also create function for switching between coins
+
+        // Insert update date after writing data
+        details[req.params.coin].accounts[req.params.type].lastUpdated = new Date(Date.now()).toString();
 
         return res.json({
             status: 'Completed',
