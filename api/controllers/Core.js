@@ -1,10 +1,14 @@
 const fs = require('fs');
 const Joi = require('@hapi/joi');
 
+const CoreController = require('../models/Core');
+
 let status = 500;
 const detailsFile = './data/details/{{coin}}.json';
 const modelFile = '../models/{{coin}}';
 const fsModelPath = './api/models/{{coin}}.js';
+const controllerFile = '../controllers/{{coin}}';
+const fsControllerPath = './api/controllers/{{coin}}.js';
 
 // POST new address for coin
 // REQUIRED: body address, coin, type
@@ -49,7 +53,7 @@ exports.setAddress = async(req, res) => {
         // Finally write new address in file
         const newAddress = await Model.updateAddress(type, address);
 
-        status = 202;
+        status = 201;
         res.status(status).json({
             result: 'success',
             data: newAddress
@@ -93,3 +97,50 @@ exports.getCoinDetails = async(req, res) => {
         res.status(status).json({ error: err })
     }
 };
+
+
+exports.updateAddressBalance = async(req, res) => {
+    try {
+        const coin = req.params.coin;
+        const type = req.params.type;
+        const file = detailsFile.replace("{{coin}}", coin);
+
+        // Check if details exists check
+        if (!fs.existsSync(file)) {
+            console.log(113);
+            status = 404;
+            throw `Details for ${coin} does not exist, please setup an address first`;
+        }
+
+        // Get address if exists or throw
+        const details = await CoreController.getCoinDetails(coin);
+        if (!details.accounts[type]) {
+            status = 400;
+            throw `Address for [${type}] is not found, please set it up first.`;
+        }
+
+        // Load controller or reject when not exist
+        if (!fs.existsSync(fsControllerPath.replace("{{coin}}", coin))) {
+            status = 404;
+            throw `Controller for ${coin} does not exist.`
+        };
+        const Controller = require(controllerFile.replace("{{coin}}", coin));
+        const result = await Controller.updateAddressBalance(address);
+
+        // If {coin} controller returns error throw
+        if (result.error) throw result;
+
+        // TODO get data to return (validated)
+
+        // finally reeturn data
+        status = 200;
+        res.status(status).json({
+            result: 'success',
+            data: result.data
+        });
+    } catch (err) {
+        let message = err;
+        if (err.message) message = err.message;
+        res.status(status).json({ error: message });
+    }
+}
