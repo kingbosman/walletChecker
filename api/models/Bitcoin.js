@@ -2,12 +2,6 @@ const fs = require('fs');
 
 const CoreModel = require('./Core');
 
-const api = {
-    apiBase: 'https://api.blockcypher.com',
-    apiAccountInfo: '/v1/btc/main/addrs/{{address}}/balance',
-    apiTransactionInfo: ''
-};
-
 const coin = {
     name: "Bitcoin",
     symbol: "BTC",

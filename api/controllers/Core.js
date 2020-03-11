@@ -12,6 +12,7 @@ const fsControllerPath = './api/controllers/{{coin}}.js';
 
 // POST new address for coin
 // REQUIRED: body address, coin, type
+// TODO after address is set get balance; if invalid remove address-type from array
 exports.setAddress = async(req, res) => {
     try {
         const overwrite = req.query.overwrite;
@@ -118,6 +119,7 @@ exports.updateAddressBalance = async(req, res) => {
             status = 400;
             throw `Address for [${type}] is not found, please set it up first.`;
         }
+        const address = details.accounts[type].address;
 
         // Load controller or reject when not exist
         if (!fs.existsSync(fsControllerPath.replace("{{coin}}", coin))) {
@@ -127,20 +129,22 @@ exports.updateAddressBalance = async(req, res) => {
         const Controller = require(controllerFile.replace("{{coin}}", coin));
         const result = await Controller.updateAddressBalance(address);
 
-        // If {coin} controller returns error throw
-        if (result.error) throw result;
+        // If {coin} controller returns error throw error
+        if (result.errmessage) {
+            status = 400;
+            throw result.errmessage
+        };
 
         // TODO get data to return (validated)
+
 
         // finally reeturn data
         status = 200;
         res.status(status).json({
             result: 'success',
-            data: result.data
+            data: result
         });
     } catch (err) {
-        let message = err;
-        if (err.message) message = err.message;
-        res.status(status).json({ error: message });
+        res.status(status).json({ error: err });
     }
 }

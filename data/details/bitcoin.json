@@ -1,1 +1,1 @@
-{"name":"Bitcoin","symbol":"BTC","accounts":{"local":{"address":"somethingOverwrite"}}}
+{"name":"Bitcoin","symbol":"BTC","accounts":{"local":{"address":"somethingOverwrite"},"tx":{"address":"3MbxZdBemDGd7qJBimVcTgof1kvBhQ4PmS"}}}
