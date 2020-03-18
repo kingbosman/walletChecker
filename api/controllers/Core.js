@@ -135,7 +135,7 @@ exports.updateAddressBalance = async(req, res) => {
             throw result.errmessage
         };
 
-        // TODO get data to return (validated)
+        // TODO get data to return (validated) {is already in result}
 
 
         // finally reeturn data

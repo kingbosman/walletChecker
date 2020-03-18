@@ -7,21 +7,35 @@ const api = {
     apiAccountInfo: '/v1/btc/main/addrs/{{address}}/balance',
     apiTransactionInfo: ''
 };
+const decimals = 8;
 
-//TODO Function to update wallet detail per address , keep address and add last updated throw wrong address
 exports.updateAddressBalance = async(address) => {
-    // TODO request to get data from api on address
-    // TODO validate response
-    // TODO set lastUpdated
-    // TODO request to write new balances into file
     try {
         const url = api.apiBase + api.apiAccountInfo.replace("{{address}}", address);
         const apiResponse = await fetch(url);
         if (apiResponse.status === 404) throw 'Invalid address';
         const apiData = await apiResponse.json();
-        apiData.lastUpdated = new Date(Date.now()).toString();
-        // TODO write apiData to file to correct type
-        return apiData
+
+        const newData = {
+            'address': apiData.address,
+            'balance': apiData.balance / Math.pow(10, decimals),
+            'unconfirmed_balance': apiData.unconfirmed_balance / Math.pow(10, decimals),
+            'final_balance': apiData.final_balance / Math.pow(10, decimals),
+            'received': apiData.total_received / Math.pow(10, decimals),
+            'sent': apiData.total_sent / Math.pow(10, decimals),
+            'txs': apiData.n_tx,
+            'unconfirmed_txs': apiData.unconfirmed_n_tx,
+            'final_txs': apiData.final_n_tx,
+            'date': new Date(Date.now()).toString()
+        };
+
+        // TODO write apiData to file to correct type, created model adjustment for this
+        // TODO seperate function to write and get
+        // TODO create route to accept address (return data only)
+        // two routes: 1: type (writes file) and returns data
+        // 2: address returns data 
+
+        return newData;
 
     } catch (err) {
         return { errmessage: err };
