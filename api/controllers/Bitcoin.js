@@ -9,7 +9,25 @@ const api = {
 };
 const decimals = 8;
 
-exports.updateAddressBalance = async(address) => {
+exports.updateAddressBalance = async(address, type) => {
+    try {
+
+        const newData = await this.getAddressBalance(address);
+        if (newData.errmessage) throw newData.errmessage;
+
+        BitcoinModel.updateAddress(type, address, newData);
+        // TODO create route to accept address (return data only)
+        // two routes: 1: type (writes file) and returns data
+        // 2: address returns data 
+
+        return newData;
+
+    } catch (err) {
+        return { errmessage: err };
+    }
+}
+
+exports.getAddressBalance = async(address) => {
     try {
         const url = api.apiBase + api.apiAccountInfo.replace("{{address}}", address);
         const apiResponse = await fetch(url);
@@ -17,7 +35,6 @@ exports.updateAddressBalance = async(address) => {
         const apiData = await apiResponse.json();
 
         const newData = {
-            'address': apiData.address,
             'balance': apiData.balance / Math.pow(10, decimals),
             'unconfirmed_balance': apiData.unconfirmed_balance / Math.pow(10, decimals),
             'final_balance': apiData.final_balance / Math.pow(10, decimals),
@@ -29,14 +46,7 @@ exports.updateAddressBalance = async(address) => {
             'date': new Date(Date.now()).toString()
         };
 
-        // TODO write apiData to file to correct type, created model adjustment for this
-        // TODO seperate function to write and get
-        // TODO create route to accept address (return data only)
-        // two routes: 1: type (writes file) and returns data
-        // 2: address returns data 
-
         return newData;
-
     } catch (err) {
         return { errmessage: err };
     }

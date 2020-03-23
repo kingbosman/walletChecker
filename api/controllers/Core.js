@@ -127,16 +127,13 @@ exports.updateAddressBalance = async(req, res) => {
             throw `Controller for ${coin} does not exist.`
         };
         const Controller = require(controllerFile.replace("{{coin}}", coin));
-        const result = await Controller.updateAddressBalance(address);
+        const result = await Controller.updateAddressBalance(address, type);
 
         // If {coin} controller returns error throw error
         if (result.errmessage) {
             status = 400;
             throw result.errmessage
         };
-
-        // TODO get data to return (validated) {is already in result}
-
 
         // finally reeturn data
         status = 200;

@@ -20,7 +20,7 @@ exports.updateAddress = async(type, address, content = false) => {
     // Reget the details to confirm latest details are being used
     const details = await this.getDetails();
     if (!content) details.accounts[type] = { address: address };
-    if (content) details.accounts[type] = content;
+    if (content) details.accounts[type] = { address: address, data: content };
     await this.writeFile(details);
     return details.accounts[type];
 };
