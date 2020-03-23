@@ -12,7 +12,7 @@ const fsControllerPath = './api/controllers/{{coin}}.js';
 
 // POST new address for coin
 // REQUIRED: body address, coin, type
-// TODO after address is set get balance; if invalid remove address-type from array
+// TODO after address is set get/update balance; if invalid remove address-type from array
 exports.setAddress = async(req, res) => {
     try {
         const overwrite = req.query.overwrite;
@@ -51,6 +51,18 @@ exports.setAddress = async(req, res) => {
                 throw `Address for type ${type} already exists. Set overwrite to true to overwrite.`
             }
         }
+
+        // Load controller or reject when not exist
+        if (!fs.existsSync(fsControllerPath.replace("{{coin}}", coin))) {
+            status = 404;
+            throw `Controller for ${coin} does not exist.`
+        };
+        const Controller = require(controllerFile.replace("{{coin}}", coin));
+
+        // TODO see previous note, if address not exist don't write?
+        const addressExists = await Controller.getAddressBalance(address);
+        if (addressExists.errmessage) throw addressExists.errmessage;
+
         // Finally write new address in file
         const newAddress = await Model.updateAddress(type, address);
 
@@ -92,7 +104,7 @@ exports.getCoinDetails = async(req, res) => {
 
         res.status(status).json({
             result: 'success',
-            data: details
+            details
         });
     } catch (err) {
         res.status(status).json({ error: err })

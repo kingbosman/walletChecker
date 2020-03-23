@@ -34,6 +34,7 @@ exports.getAddressBalance = async(address) => {
         if (apiResponse.status === 404) throw 'Invalid address';
         const apiData = await apiResponse.json();
 
+        // Only set this data to array
         const newData = {
             'balance': apiData.balance / Math.pow(10, decimals),
             'unconfirmed_balance': apiData.unconfirmed_balance / Math.pow(10, decimals),
@@ -46,6 +47,13 @@ exports.getAddressBalance = async(address) => {
             'date': new Date(Date.now()).toString()
         };
 
+        // Check for api errors or server errors
+        if (!newData.balance) {
+            if (apiData.error) throw apiData.error;
+            throw 'Unknown error...';
+        }
+
+        // Finally return data
         return newData;
     } catch (err) {
         return { errmessage: err };
