@@ -12,14 +12,14 @@ const decimals = 8;
 exports.updateAddressBalance = async(address, type) => {
     try {
 
+        // Get data from API
         const newData = await this.getAddressBalance(address);
         if (newData.errmessage) throw newData.errmessage;
 
+        // Update file with new data
         BitcoinModel.updateAddress(type, address, newData);
-        // TODO create route to accept address (return data only)
-        // two routes: 1: type (writes file) and returns data
-        // 2: address returns data 
 
+        // Return data retrieved from API
         return newData;
 
     } catch (err) {

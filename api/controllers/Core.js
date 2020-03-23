@@ -12,7 +12,6 @@ const fsControllerPath = './api/controllers/{{coin}}.js';
 
 // POST new address for coin
 // REQUIRED: body address, coin, type
-// TODO after address is set get/update balance; if invalid remove address-type from array
 exports.setAddress = async(req, res) => {
     try {
         const overwrite = req.query.overwrite;
@@ -59,7 +58,7 @@ exports.setAddress = async(req, res) => {
         };
         const Controller = require(controllerFile.replace("{{coin}}", coin));
 
-        // TODO see previous note, if address not exist don't write?
+        // If address not exist don't write?
         const addressExists = await Controller.getAddressBalance(address);
         if (addressExists.errmessage) throw addressExists.errmessage;
 
@@ -120,7 +119,6 @@ exports.updateAddressBalance = async(req, res) => {
 
         // Check if details exists check
         if (!fs.existsSync(file)) {
-            console.log(113);
             status = 404;
             throw `Details for ${coin} does not exist, please setup an address first`;
         }
@@ -147,7 +145,37 @@ exports.updateAddressBalance = async(req, res) => {
             throw result.errmessage
         };
 
-        // finally reeturn data
+        // finally return data
+        status = 200;
+        res.status(status).json({
+            result: 'success',
+            data: result
+        });
+    } catch (err) {
+        res.status(status).json({ error: err });
+    }
+}
+
+exports.getAddressBalance = async(req, res) => {
+    try {
+        const coin = req.params.coin;
+        const address = req.params.address;
+
+        // Load controller or reject when not exist
+        if (!fs.existsSync(fsControllerPath.replace("{{coin}}", coin))) {
+            status = 404;
+            throw `Controller for ${coin} does not exist.`
+        };
+        const Controller = require(controllerFile.replace("{{coin}}", coin));
+        const result = await Controller.getAddressBalance(address);
+
+        // If {coin} controller returns error throw error
+        if (result.errmessage) {
+            status = 400;
+            throw result.errmessage
+        };
+
+        // finally return data
         status = 200;
         res.status(status).json({
             result: 'success',
