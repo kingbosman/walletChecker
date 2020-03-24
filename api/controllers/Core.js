@@ -4,6 +4,8 @@ const Joi = require('@hapi/joi');
 const CoreController = require('../models/Core');
 
 let status = 500;
+
+// TODO Remove needed (non used)
 const detailsFile = './data/details/{{coin}}.json';
 const modelFile = '../models/{{coin}}';
 const fsModelPath = './api/models/{{coin}}.js';
@@ -28,18 +30,21 @@ exports.setAddress = async(req, res) => {
         if (validate.error) throw validate.error.details[0].message;
 
         // Load model or reject when not exist
+        // TODO determine if still need to load model
         if (!fs.existsSync(fsModelPath.replace("{{coin}}", coin))) {
             status = 404;
             throw `Model for ${coin} does not exist.`
         }
         const Model = require(modelFile.replace("{{coin}}", coin));
 
+        // TODO remove files move to DB
         // If non existent details file create template file for coin
         const file = detailsFile.replace("{{coin}}", coin);
         if (!fs.existsSync(file)) {
             Model.writeFile();
         }
 
+        // TODO get from DB
         // Get the file
         const details = await Model.getDetails();
 
@@ -51,17 +56,20 @@ exports.setAddress = async(req, res) => {
             }
         }
 
-        // Load controller or reject when not exist
+        // Rreject when controller does not exist
         if (!fs.existsSync(fsControllerPath.replace("{{coin}}", coin))) {
             status = 404;
             throw `Controller for ${coin} does not exist.`
-        };
+        }
+
+        // Load controller
         const Controller = require(controllerFile.replace("{{coin}}", coin));
 
-        // If address not exist don't write?
+        // If address does not exist don't write?
         const addressExists = await Controller.getAddressBalance(address);
         if (addressExists.errmessage) throw addressExists.errmessage;
 
+        // TODO Write to DB
         // Finally write new address in file
         const newAddress = await Model.updateAddress(type, address);
 
@@ -82,8 +90,10 @@ exports.getCoinDetails = async(req, res) => {
     try {
         // Set needed consts
         const coin = req.params.coin;
+        // TODO remove file move to DB
         const file = detailsFile.replace("{{coin}}", coin);
 
+        // TODO check if model still needed
         // Load model or reject when not exist
         if (!fs.existsSync(fsModelPath.replace("{{coin}}", coin))) {
             status = 404;
@@ -91,12 +101,14 @@ exports.getCoinDetails = async(req, res) => {
         }
         const Model = require(modelFile.replace("{{coin}}", coin));
 
+        // TODO remove file use DB
         // Check if exists check
         if (!fs.existsSync(file)) {
             status = 404;
             throw `Details for ${coin} does not exist, please setup an address first`;
         }
 
+        // TODO check if needed or just DB select
         // get all details from [coin]
         const details = await Model.getDetails();
         status = 200;
@@ -115,14 +127,17 @@ exports.updateAddressBalance = async(req, res) => {
     try {
         const coin = req.params.coin;
         const type = req.params.type;
+        // TODO remove file move to DB
         const file = detailsFile.replace("{{coin}}", coin);
 
+        // TODO move file to DB
         // Check if details exists check
         if (!fs.existsSync(file)) {
             status = 404;
             throw `Details for ${coin} does not exist, please setup an address first`;
         }
 
+        // TODO this is also from a file, use DB instead
         // Get address if exists or throw
         const details = await CoreController.getCoinDetails(coin);
         if (!details.accounts[type]) {
@@ -131,19 +146,24 @@ exports.updateAddressBalance = async(req, res) => {
         }
         const address = details.accounts[type].address;
 
-        // Load controller or reject when not exist
+        // Reject when controller does not exist
         if (!fs.existsSync(fsControllerPath.replace("{{coin}}", coin))) {
             status = 404;
             throw `Controller for ${coin} does not exist.`
-        };
+        }
+
+        // Load controller
         const Controller = require(controllerFile.replace("{{coin}}", coin));
+
+        // TODO Move from fiel to DB
+        // Update balance
         const result = await Controller.updateAddressBalance(address, type);
 
         // If {coin} controller returns error throw error
         if (result.errmessage) {
             status = 400;
             throw result.errmessage
-        };
+        }
 
         // finally return data
         status = 200;
@@ -161,19 +181,23 @@ exports.getAddressBalance = async(req, res) => {
         const coin = req.params.coin;
         const address = req.params.address;
 
-        // Load controller or reject when not exist
+        // Reject when controller does not exist
         if (!fs.existsSync(fsControllerPath.replace("{{coin}}", coin))) {
             status = 404;
             throw `Controller for ${coin} does not exist.`
-        };
+        }
+
+        // Load controller
         const Controller = require(controllerFile.replace("{{coin}}", coin));
+
+        // Get balance data
         const result = await Controller.getAddressBalance(address);
 
         // If {coin} controller returns error throw error
         if (result.errmessage) {
             status = 400;
             throw result.errmessage
-        };
+        }
 
         // finally return data
         status = 200;

@@ -2,11 +2,13 @@ const fetch = require('node-fetch');
 
 const BitcoinModel = require('../models/Bitcoin');
 
+// TODO move API info to DB
 const api = {
     apiBase: 'https://api.blockcypher.com',
     apiAccountInfo: '/v1/btc/main/addrs/{{address}}/balance',
     apiTransactionInfo: ''
 };
+// TODO move decimals to coin info DB
 const decimals = 8;
 
 exports.updateAddressBalance = async(address, type) => {
@@ -16,6 +18,8 @@ exports.updateAddressBalance = async(address, type) => {
         const newData = await this.getAddressBalance(address);
         if (newData.errmessage) throw newData.errmessage;
 
+        // TODO dont file but DB
+        // TODO determien if we still need to load model
         // Update file with new data
         BitcoinModel.updateAddress(type, address, newData);
 
@@ -29,7 +33,9 @@ exports.updateAddressBalance = async(address, type) => {
 
 exports.getAddressBalance = async(address) => {
     try {
+        // TODO url from DB
         const url = api.apiBase + api.apiAccountInfo.replace("{{address}}", address);
+
         const apiResponse = await fetch(url);
         if (apiResponse.status === 404) throw 'Invalid address';
         const apiData = await apiResponse.json();
