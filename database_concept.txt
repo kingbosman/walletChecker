@@ -1,0 +1,21 @@
+# model DB
+
+# Audit trail all crypto wallets
+
+# All info about the specific crypto
+## Different wallets which need to be stored and refreshed on address change
+### these wallets have balance which need to be updated once a transaction occurs or once in x time (some dont have auto refresh)
+### These wallets also contain transactions which need to be automatically updated (and check all txs)
+### a listener will also influence balance or/and transactions of a wallets
+
+## All entities will have
+- createdAt
+- updatedAt
+
+## TODO entities 
+* [x] Coin/currency info
+* [ ] Currency Wallet addresses
+* [ ] Currency wallet types
+* [ ] Wallet balances
+* [ ] Transactions
+* [x] person/user
