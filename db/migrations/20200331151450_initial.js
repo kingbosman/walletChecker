@@ -1,5 +1,6 @@
 const tableNames = require('../tableNames');
-const Knex = require('knex');
+
+// TODO see if knex does somethign
 
 function addDefaultColumns(table) {
     table.timestamps(false, true);
@@ -15,9 +16,6 @@ function references(table, tableName) {
         .onDelete('cascade');
 }
 
-/**
- * @param {Knex} knex
- */
 exports.up = async(knex) => {
 
     // Process 1: Create all tables without FK
@@ -62,37 +60,12 @@ exports.up = async(knex) => {
 
     // Process 3: Create all tables with FK until process 2
     await Promise.all([
-        knex.schema.createTable(tableNames.output, (table) => {
-            table.increments().notNullable();
-            references(table, tableNames.transaction);
-            references(table, tableNames.currency);
-            table.string('address').notNullable();
-            table.string('value').notNullable();
-            addDefaultColumns(table);
-        }),
-        knex.schema.createTable(tableNames.input, (table) => {
-            table.increments().notNullable();
-            references(table, tableNames.transaction);
-            references(table, tableNames.currency);
-            table.string('address').notNullable();
-            table.string('value').notNullable();
-            table.string('sequence');
-            addDefaultColumns(table);
-        }),
         knex.schema.createTable(tableNames.address, (table) => {
             table.increments().notNullable();
             references(table, tableNames.currency);
             references(table, tableNames.address_type);
             references(table, tableNames.network);
             table.string('address').notNullable();
-            addDefaultColumns(table);
-        }),
-        knex.schema.createTable(tableNames.acknowledged, (table) => {
-            table.increments().notNullable();
-            references(table, tableNames.transaction);
-            references(table, tableNames.person);
-            table.string('note');
-            table.string('ip_address').notNullable();
             addDefaultColumns(table);
         })
     ]);
@@ -132,39 +105,69 @@ exports.up = async(knex) => {
         })
     ]);
 
+    // Process 5: Create all tables with FK until process 4
+    await Promise.all([
+        knex.schema.createTable(tableNames.output, (table) => {
+            table.increments().notNullable();
+            references(table, tableNames.transaction);
+            references(table, tableNames.currency);
+            table.string('address').notNullable();
+            table.string('value').notNullable();
+            addDefaultColumns(table);
+        }),
+        knex.schema.createTable(tableNames.input, (table) => {
+            table.increments().notNullable();
+            references(table, tableNames.transaction);
+            references(table, tableNames.currency);
+            table.string('address').notNullable();
+            table.string('value').notNullable();
+            table.string('sequence');
+            addDefaultColumns(table);
+        }),
+        knex.schema.createTable(tableNames.acknowledged, (table) => {
+            table.increments().notNullable();
+            references(table, tableNames.transaction);
+            references(table, tableNames.person);
+            table.string('note');
+            table.string('ip_address').notNullable();
+            addDefaultColumns(table);
+        })
+    ]);
+
 };
 
 exports.down = async(knex) => {
 
-    // Process 4
-    await Promise.all([
-        tableNames.balance,
-        tableNames.access_checked,
-        tableNames.transaction
-    ].map((tableName) => knex.schema.dropTable(tableName)));
-
-    // Process 3
+    //Process 1: No references from primary key
     await Promise.all([
         tableNames.output,
         tableNames.input,
         tableNames.acknowledged,
-        tableNames.address
+        tableNames.access_checked,
+        tableNames.balance,
     ].map((tableName) => knex.schema.dropTable(tableName)));
 
-    // process 2
+    // Process 2: PK only relates to anything in process 1
+    await Promise.all([
+        tableNames.transaction,
+        tableNames.person,
+    ].map((tableName) => knex.schema.dropTable(tableName)));
+
+    // process 3: PK only relates to anything in process 1-2
+    await Promise.all([
+        tableNames.address,
+        tableNames.block,
+    ].map((tableName) => knex.schema.dropTable(tableName)));
+
+    // Process 4: PK only relates to anything in process 1-3
     await Promise.all([
         tableNames.network,
-        tableNames.block
+        tableNames.address_type,
     ].map((tableName) => knex.schema.dropTable(tableName)));
 
-    // Process 1
+    // Process 5: PK only relates to anything in process 1-4
     await Promise.all([
         tableNames.currency,
-        tableNames.address_type,
-        tableNames.person
     ].map((tableName) => knex.schema.dropTable(tableName)));
 
 };
-
-// TODO FIX ERROR rollback & migrate 
-// The order where tables are created and/or dropped is not correct
