@@ -105,7 +105,6 @@ exports.up = async(knex) => {
         knex.schema.createTable(tableNames.output, (table) => {
             table.increments().notNullable();
             references(table, tableNames.transaction);
-            references(table, tableNames.currency);
             table.string('address').notNullable();
             table.string('value').notNullable();
             addDefaultColumns(table);
@@ -113,7 +112,6 @@ exports.up = async(knex) => {
         knex.schema.createTable(tableNames.input, (table) => {
             table.increments().notNullable();
             references(table, tableNames.transaction);
-            references(table, tableNames.currency);
             table.string('address').notNullable();
             table.string('value').notNullable();
             table.string('sequence');
