@@ -38,28 +38,23 @@ exports.up = async(knex) => {
             table.string('abbreviation', 5).notNullable();
             table.integer('decimal_places').notNullable();
             addDefaultColumns(table);
+        }),
+        knex.schema.createTable(tableNames.network, (table) => {
+            table.increments().notNullable();
+            table.string('name', 25).notNullable().unique();
+            addDefaultColumns(table);
         })
     ]);
 
     // Process 2: Create all tables with FK until process 1
     await Promise.all([
-        knex.schema.createTable(tableNames.network, (table) => {
-            table.increments().notNullable();
-            references(table, tableNames.currency);
-            table.string('name', 25).notNullable().unique();
-            addDefaultColumns(table);
-        }),
         knex.schema.createTable(tableNames.block, (table) => {
             table.increments().notNullable();
             references(table, tableNames.currency);
             table.integer('height').notNullable();
             table.integer('confirmations').notNullable();
             addDefaultColumns(table);
-        })
-    ]);
-
-    // Process 3: Create all tables with FK until process 2
-    await Promise.all([
+        }),
         knex.schema.createTable(tableNames.address, (table) => {
             table.increments().notNullable();
             references(table, tableNames.currency);
@@ -70,7 +65,7 @@ exports.up = async(knex) => {
         })
     ]);
 
-    // Process 4: Create all tables with FK until process 3
+    // Process 3: Create all tables with FK until process 2
     await Promise.all([
         knex.schema.createTable(tableNames.transaction, (table) => {
             table.increments().notNullable();
@@ -105,7 +100,7 @@ exports.up = async(knex) => {
         })
     ]);
 
-    // Process 5: Create all tables with FK until process 4
+    // Process 4: Create all tables with FK until process 3
     await Promise.all([
         knex.schema.createTable(tableNames.output, (table) => {
             table.increments().notNullable();
