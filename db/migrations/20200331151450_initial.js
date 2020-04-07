@@ -1,7 +1,5 @@
 const tableNames = require('../tableNames');
 
-// TODO see if knex does somethign
-
 function addDefaultColumns(table) {
     table.timestamps(false, true);
     table.datetime('deleted_at');
