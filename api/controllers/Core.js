@@ -12,6 +12,17 @@ const fsModelPath = './api/models/{{coin}}.js';
 const controllerFile = '../controllers/{{coin}}';
 const fsControllerPath = './api/controllers/{{coin}}.js';
 
+
+exports.test = async(req, res) => {
+    const TestModel = require('../models/db/Currency');
+
+    const result = await TestModel.getActiveCurrencyByAbbreviation('btc');
+
+    res.json({
+        result: result
+    })
+}
+
 // POST new address for coin
 // REQUIRED: body address, coin, type
 exports.setAddress = async(req, res) => {
