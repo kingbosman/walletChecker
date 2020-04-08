@@ -1,63 +1,59 @@
 const db = require('../../../db/knex');
+const tableNames = require('../../../db/tableNames');
 
-// Basic no joins
-
-// Limit 100
-exports.getActive = (offset = 0) => {
+// Limit 1000
+exports.getActiveCurrency = (filter = {}, offset = 0) => {
     return db.select()
-        .from('currency')
+        .from(tableNames.currency)
+        .where(filter)
         .whereNull('deleted_at')
-        .limit(100)
-        .offset(offset);
+        .limit(1000)
+        .offset(offset)
+        .orderBy('id');
 }
 
-exports.getActiveCurrencyById = (id) => {
-    return db.select()
-        .from('currency')
-        .where('id', id)
-        .whereNull('deleted_at');
+exports.getActiveCurrencyOverview = (filter = {}, offset = 0) => {
+    return db.select(`${tableNames.currency}.abbreviation`,
+            `${tableNames.address}.address`)
+        .from(tableNames.currency)
+        .join(`${tableNames.address}`, function() {
+            this
+                .on(`${tableNames.currency}.id`,
+                    `${tableNames.address}.${tableNames.currency}_id`)
+                .onNull(`${tableNames.address}.deleted_at`)
+        })
+        .where(filter)
+        .whereNull(`${tableNames.currency}.deleted_at`)
+        .limit(1000)
+        .offset(offset)
 }
 
-// limit 25
-exports.getActiveCurrencyByAbbreviation = async(abbreviation, offset = 0) => {
-    return db.select()
-        .from('currency')
-        .where('abbreviation', abbreviation)
-        .whereNull('deleted_at')
-        .limit(10)
-        .offset(offset);
+exports.createCurrency = (data) => {
+    return db(tableNames.currency)
+        .insert(data)
+        .returning('*');
 }
 
-exports.createCurrency = async(name, abbreviation, decimals = 8, ) => {
-    // do something
-}
-
-exports.updateCurrency = async(id, data = []) => {
-    // do something
+exports.updateCurrency = async(id, data) => {
+    return db(tableNames.currency)
+        .where({ id: id })
+        .update(data)
+        .returning('*');
 }
 
 exports.softDeleteActiveCurrency = async(id) => {
-    // do something
+    return db(tableNames.currency)
+        .where({ id: id })
+        .update({ deleted_at: new Date() })
+        .returning('*');
 }
 
 
 // Full overview
 // TODO 
-// [ ] currencies
+// [x] currencies
 // -- [ ]addresses
 // -- -- [ ] network
 // -- -- -- [ ] address types
 // -- -- -- -- [ ] access checked (true/false/any)
 // -- -- -- -- -- [ ] person checked
-
-// Example to get fil;ters with oen query by passing json array
-// http://knexjs.org/#Builder-where
-// knex('users').where({
-//     first_name: 'Test',
-//     last_name: 'User'
-// }).select('id')
-// Outputs:
-//     select `id`
-// from `users`
-// where `first_name` = 'Test'
-// and `last_name` = 'User'

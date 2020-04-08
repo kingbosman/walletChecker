@@ -16,11 +16,17 @@ const fsControllerPath = './api/controllers/{{coin}}.js';
 exports.test = async(req, res) => {
     const TestModel = require('../models/db/Currency');
 
-    const result = await TestModel.getActiveCurrencyByAbbreviation('btc');
+    try {
+        const result = await TestModel.getActiveCurrencyOverview();
 
-    res.json({
-        result: result
-    })
+        res.json({
+            result: result
+        })
+    } catch (err) {
+        res.json({
+            err: err
+        })
+    }
 }
 
 // POST new address for coin
