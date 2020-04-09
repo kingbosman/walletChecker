@@ -53,15 +53,33 @@ exports.up = async(knex) => {
             table.integer('confirmations').notNullable();
             addDefaultColumns(table);
         }),
-        knex.schema.createTable(tableNames.address, (table) => {
+        knex.schema.createTable(tableNames.balance, (table) => {
             table.increments().notNullable();
             references(table, tableNames.currency);
             references(table, tableNames.address_type);
             references(table, tableNames.network);
-            table.string('address').notNullable();
+            table.decimal('balance', 35, 18);
+            table.decimal('unconfirmed_balance', 35, 18);
+            table.decimal('final_balance', 35, 18);
+            table.integer('transactions');
+            table.integer('unconfirmed_transactions');
+            table.integer('final_transactions');
+            table.decimal('sent', 35, 18);
+            table.decimal('received', 35, 18);
             addDefaultColumns(table);
         })
     ]);
+
+    // Process 2.5 create address
+    await knex.schema.createTable(tableNames.address, (table) => {
+        table.increments().notNullable();
+        references(table, tableNames.currency);
+        references(table, tableNames.address_type);
+        references(table, tableNames.network);
+        references(table, tableNames.balance);
+        table.string('address').notNullable();
+        addDefaultColumns(table);
+    });
 
     // Process 3: Create all tables with FK until process 2
     await Promise.all([
@@ -80,20 +98,6 @@ exports.up = async(knex) => {
             references(table, tableNames.person);
             table.string('note');
             table.string('ip_address').notNullable();
-            addDefaultColumns(table);
-        }),
-        knex.schema.createTable(tableNames.balance, (table) => {
-            table.increments().notNullable();
-            references(table, tableNames.address);
-            references(table, tableNames.currency);
-            table.decimal('balance', 35, 18);
-            table.decimal('unconfirmed_balance', 35, 18);
-            table.decimal('final_balance', 35, 18);
-            table.integer('transactions');
-            table.integer('unconfirmed_transactions');
-            table.integer('final_transactions');
-            table.decimal('sent', 35, 18);
-            table.decimal('received', 35, 18);
             addDefaultColumns(table);
         })
     ]);
@@ -135,7 +139,6 @@ exports.down = async(knex) => {
         tableNames.input,
         tableNames.acknowledged,
         tableNames.access_checked,
-        tableNames.balance,
     ].map((tableName) => knex.schema.dropTable(tableName)));
 
     // Process 2: PK only relates to anything in process 1
@@ -150,15 +153,16 @@ exports.down = async(knex) => {
         tableNames.block,
     ].map((tableName) => knex.schema.dropTable(tableName)));
 
+    // Process 3.5
+    await knex.schema.dropTable(tableNames.balance);
+
     // Process 4: PK only relates to anything in process 1-3
     await Promise.all([
         tableNames.network,
         tableNames.address_type,
     ].map((tableName) => knex.schema.dropTable(tableName)));
 
-    // Process 5: PK only relates to anything in process 1-4
-    await Promise.all([
-        tableNames.currency,
-    ].map((tableName) => knex.schema.dropTable(tableName)));
+    // Process 5
+    await knex.schema.dropTable(tableNames.currency);
 
 };
