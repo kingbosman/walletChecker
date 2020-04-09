@@ -58,14 +58,14 @@ exports.up = async(knex) => {
             references(table, tableNames.currency);
             references(table, tableNames.address_type);
             references(table, tableNames.network);
-            table.decimal('balance', 35, 18);
-            table.decimal('unconfirmed_balance', 35, 18);
-            table.decimal('final_balance', 35, 18);
+            table.bigInteger('balance');
+            table.bigInteger('unconfirmed_balance');
+            table.bigInteger('final_balance');
             table.integer('transactions');
             table.integer('unconfirmed_transactions');
             table.integer('final_transactions');
-            table.decimal('sent', 35, 18);
-            table.decimal('received', 35, 18);
+            table.bigInteger('sent');
+            table.bigInteger('received');
             addDefaultColumns(table);
         })
     ]);
@@ -90,6 +90,7 @@ exports.up = async(knex) => {
             references(table, tableNames.network);
             references(table, tableNames.block);
             table.string('tx_id').notNullable();
+            table.bigInteger('value').notNullable();
             addDefaultColumns(table);
         }),
         knex.schema.createTable(tableNames.access_checked, (table) => {
@@ -108,15 +109,15 @@ exports.up = async(knex) => {
             table.increments().notNullable();
             references(table, tableNames.transaction);
             table.string('address').notNullable();
-            table.string('value').notNullable();
+            table.bigInteger('value').notNullable();
             addDefaultColumns(table);
         }),
         knex.schema.createTable(tableNames.input, (table) => {
             table.increments().notNullable();
             references(table, tableNames.transaction);
             table.string('address').notNullable();
-            table.string('value').notNullable();
-            table.string('sequence');
+            table.bigInteger('value').notNullable();
+            table.integer('sequence');
             addDefaultColumns(table);
         }),
         knex.schema.createTable(tableNames.acknowledged, (table) => {
