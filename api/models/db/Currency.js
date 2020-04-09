@@ -1,5 +1,4 @@
-const db = require('../../../db/knex');
-const tableNames = require('../../../db/tableNames');
+const { db, tableNames } = require('../../../db/knex');
 
 // Limit 1000
 exports.getActiveCurrency = (filter = {}, offset = 0) => {
@@ -12,6 +11,27 @@ exports.getActiveCurrency = (filter = {}, offset = 0) => {
         .orderBy('id');
 }
 
+exports.createCurrency = (newEntity) => {
+    return db(tableNames.currency)
+        .insert(newEntity)
+        .returning('*');
+}
+
+exports.updateCurrency = async(id, updateInfo) => {
+    return db(tableNames.currency)
+        .where({ id: id })
+        .update(updateInfo)
+        .returning('*');
+}
+
+exports.softDeleteActiveCurrency = async(id) => {
+    return db(tableNames.currency)
+        .where({ id: id })
+        .update({ deleted_at: new Date() })
+        .returning('*');
+}
+
+// TODO beneath is example, please remove
 exports.getActiveCurrencyOverview = (filter = {}, offset = 0) => {
     return db.select(`${tableNames.currency}.abbreviation`,
             `${tableNames.address}.address`)
@@ -27,33 +47,3 @@ exports.getActiveCurrencyOverview = (filter = {}, offset = 0) => {
         .limit(1000)
         .offset(offset)
 }
-
-exports.createCurrency = (data) => {
-    return db(tableNames.currency)
-        .insert(data)
-        .returning('*');
-}
-
-exports.updateCurrency = async(id, data) => {
-    return db(tableNames.currency)
-        .where({ id: id })
-        .update(data)
-        .returning('*');
-}
-
-exports.softDeleteActiveCurrency = async(id) => {
-    return db(tableNames.currency)
-        .where({ id: id })
-        .update({ deleted_at: new Date() })
-        .returning('*');
-}
-
-
-// Full overview
-// TODO 
-// [x] currencies
-// -- [ ]addresses
-// -- -- [ ] network
-// -- -- -- [ ] address types
-// -- -- -- -- [ ] access checked (true/false/any)
-// -- -- -- -- -- [ ] person checked
