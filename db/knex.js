@@ -4,4 +4,5 @@ const environmentConfig = config[environment];
 const knex = require('knex');
 const connection = knex(environmentConfig);
 
-module.exports = connection;
+exports.db = connection;
+exports.tableNames = require('../db/tableNames');
