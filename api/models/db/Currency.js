@@ -1,12 +1,18 @@
 const { db, tableNames } = require('../../../db/knex');
 
-// Limit 1000
-exports.getActiveCurrency = (filter = {}, offset = 0) => {
-    return db.select()
+exports.getActiveCurrencies = (filter = {}, offset = 0, limit = 1000) => {
+    return db.select(
+            `${tableNames.currency}.id`,
+            `${tableNames.currency}.name`,
+            `${tableNames.currency}.abbreviation`,
+            `${tableNames.currency}.decimal_places`,
+            `${tableNames.currency}.created_at`,
+            `${tableNames.currency}.updated_at`,
+        )
         .from(tableNames.currency)
         .where(filter)
         .whereNull('deleted_at')
-        .limit(1000)
+        .limit(limit)
         .offset(offset)
         .orderBy('id');
 }
@@ -17,14 +23,14 @@ exports.createCurrency = (newEntity) => {
         .returning('*');
 }
 
-exports.updateCurrency = async(id, updateInfo) => {
+exports.updateCurrency = (id, updateInfo) => {
     return db(tableNames.currency)
         .where({ id: id })
         .update(updateInfo)
         .returning('*');
 }
 
-exports.softDeleteActiveCurrency = async(id) => {
+exports.softDeleteCurrency = (id) => {
     return db(tableNames.currency)
         .where({ id: id })
         .update({ deleted_at: new Date() })
