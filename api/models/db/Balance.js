@@ -1,6 +1,6 @@
 const { db, tableNames } = require('../../../db/knex');
 
-exports.getActiveBalances = (filter = {}, offset = 0) => {
+exports.getActiveBalances = (filter = {}, offset = 0, limit = 1000) => {
     return db.select(
             `${tableNames.balance}.id`,
             `${tableNames.currency}.name as currency`,
@@ -40,7 +40,7 @@ exports.getActiveBalances = (filter = {}, offset = 0) => {
         })
         .where(filter)
         .whereNull(`${tableNames.balance}.deleted_at`)
-        .limit(1000)
+        .limit(limit)
         .offset(offset)
 }
 

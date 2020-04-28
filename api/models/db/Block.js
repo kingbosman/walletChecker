@@ -1,6 +1,6 @@
 const { db, tableNames } = require('../../../db/knex');
 
-exports.getActiveBlocks = (filter = {}, offset = 0) => {
+exports.getActiveBlocks = (filter = {}, offset = 0, limit = 1000) => {
     return db.select(
             `${tableNames.block}.id`,
             `${tableNames.block}.height`,
@@ -20,7 +20,7 @@ exports.getActiveBlocks = (filter = {}, offset = 0) => {
         })
         .where(filter)
         .whereNull(`${tableNames.currency}.deleted_at`)
-        .limit(1000)
+        .limit(limit)
         .offset(offset)
 }
 
