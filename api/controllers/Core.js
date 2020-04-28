@@ -14,19 +14,7 @@ const fsControllerPath = './api/controllers/{{coin}}.js';
 
 // TODO remove test
 exports.test = async(req, res) => {
-    const TestModel = require('../models/db/Acknowledged');
 
-    try {
-        const result = await TestModel.getActive();
-
-        res.json({
-            result: result
-        })
-    } catch (err) {
-        res.json({
-            err: err
-        })
-    }
 }
 
 // POST new address for coin
