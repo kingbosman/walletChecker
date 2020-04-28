@@ -32,13 +32,13 @@ exports.getActive = (filter = {}, offset = 0, limit = 1000) => {
 }
 
 exports.create = (newEntity) => {
-    return db(tableNames.access_checked)
+    return db(tableNames.acknowledged)
         .insert(newEntity)
         .returning('*');
 }
 
 exports.update = (id, updateInfo) => {
-    return db(tableNames.access_checked)
+    return db(tableNames.acknowledged)
         .where({ id: id })
         .update(updateInfo)
         .update({ updated_at: new Date() })
@@ -46,7 +46,7 @@ exports.update = (id, updateInfo) => {
 }
 
 exports.softDelete = (id) => {
-    return db(tableNames.access_checked)
+    return db(tableNames.acknowledged)
         .where({ id: id })
         .update({
             deleted_at: new Date(),
