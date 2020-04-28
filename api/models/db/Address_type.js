@@ -1,6 +1,6 @@
 const { db, tableNames } = require('../../../db/knex');
 
-exports.getActiveAddressTypes = (filter = {}, offset = 0, limit = 1000) => {
+exports.getActive = (filter = {}, offset = 0, limit = 1000) => {
     return db.select(
             `${tableNames.address_type}.id`,
             `${tableNames.address_type}.name`,
@@ -15,13 +15,13 @@ exports.getActiveAddressTypes = (filter = {}, offset = 0, limit = 1000) => {
         .orderBy('id');
 }
 
-exports.createAddressType = (newEntity) => {
+exports.create = (newEntity) => {
     return db(tableNames.address_type)
         .insert(newEntity)
         .returning('*');
 }
 
-exports.updateAddressType = (id, updateInfo) => {
+exports.update = (id, updateInfo) => {
     return db(tableNames.address_type)
         .where({ id: id })
         .update(updateInfo)
@@ -29,7 +29,7 @@ exports.updateAddressType = (id, updateInfo) => {
         .returning('*');
 }
 
-exports.softDeleteAddressType = (id) => {
+exports.softDelete = (id) => {
     return db(tableNames.address_type)
         .where({ id: id })
         .update({

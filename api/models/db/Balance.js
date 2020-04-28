@@ -1,6 +1,6 @@
 const { db, tableNames } = require('../../../db/knex');
 
-exports.getActiveBalances = (filter = {}, offset = 0, limit = 1000) => {
+exports.getActive = (filter = {}, offset = 0, limit = 1000) => {
     return db.select(
             `${tableNames.balance}.id`,
             `${tableNames.currency}.name as currency`,
@@ -44,13 +44,13 @@ exports.getActiveBalances = (filter = {}, offset = 0, limit = 1000) => {
         .offset(offset)
 }
 
-exports.createBalance = (newEntity) => {
+exports.create = (newEntity) => {
     return db(tableNames.balance)
         .insert(newEntity)
         .returning('*');
 }
 
-exports.updateBalance = (id, updateInfo) => {
+exports.update = (id, updateInfo) => {
     return db(tableNames.balance)
         .where({ id: id })
         .update(updateInfo)
@@ -58,7 +58,7 @@ exports.updateBalance = (id, updateInfo) => {
         .returning('*');
 }
 
-exports.softDeleteBalance = (id) => {
+exports.softDelete = (id) => {
     return db(tableNames.balance)
         .where({ id: id })
         .update({

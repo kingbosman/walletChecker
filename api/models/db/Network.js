@@ -1,6 +1,6 @@
 const { db, tableNames } = require('../../../db/knex');
 
-exports.getActiveNetworks = (filter = {}, offset = 0, limit = 1000) => {
+exports.getActive = (filter = {}, offset = 0, limit = 1000) => {
     return db.select(
             `${tableNames.network}.id`,
             `${tableNames.network}.type`,
@@ -15,13 +15,13 @@ exports.getActiveNetworks = (filter = {}, offset = 0, limit = 1000) => {
         .orderBy('id');
 }
 
-exports.createNetwork = (newEntity) => {
+exports.create = (newEntity) => {
     return db(tableNames.network)
         .insert(newEntity)
         .returning('*');
 }
 
-exports.updateNetwork = (id, updateInfo) => {
+exports.update = (id, updateInfo) => {
     return db(tableNames.network)
         .where({ id: id })
         .update(updateInfo)
@@ -29,7 +29,7 @@ exports.updateNetwork = (id, updateInfo) => {
         .returning('*');
 }
 
-exports.softDeleteNetwork = (id) => {
+exports.softDelete = (id) => {
     return db(tableNames.network)
         .where({ id: id })
         .update({

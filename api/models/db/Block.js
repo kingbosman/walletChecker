@@ -1,6 +1,6 @@
 const { db, tableNames } = require('../../../db/knex');
 
-exports.getActiveBlocks = (filter = {}, offset = 0, limit = 1000) => {
+exports.getActive = (filter = {}, offset = 0, limit = 1000) => {
     return db.select(
             `${tableNames.block}.id`,
             `${tableNames.block}.height`,
@@ -24,13 +24,13 @@ exports.getActiveBlocks = (filter = {}, offset = 0, limit = 1000) => {
         .offset(offset)
 }
 
-exports.createBlock = (newEntity) => {
+exports.create = (newEntity) => {
     return db(tableNames.block)
         .insert(newEntity)
         .returning('*');
 }
 
-exports.updateBlock = (id, updateInfo) => {
+exports.update = (id, updateInfo) => {
     return db(tableNames.block)
         .where({ id: id })
         .update(updateInfo)
@@ -38,7 +38,7 @@ exports.updateBlock = (id, updateInfo) => {
         .returning('*');
 }
 
-exports.softDeleteBlock = (id) => {
+exports.softDelete = (id) => {
     return db(tableNames.block)
         .where({ id: id })
         .update({

@@ -1,6 +1,6 @@
 const { db, tableNames } = require('../../../db/knex');
 
-exports.getActiveCurrencies = (filter = {}, offset = 0, limit = 1000) => {
+exports.getActive = (filter = {}, offset = 0, limit = 1000) => {
     return db.select(
             `${tableNames.currency}.id`,
             `${tableNames.currency}.name`,
@@ -17,13 +17,13 @@ exports.getActiveCurrencies = (filter = {}, offset = 0, limit = 1000) => {
         .orderBy('id');
 }
 
-exports.createCurrency = (newEntity) => {
+exports.create = (newEntity) => {
     return db(tableNames.currency)
         .insert(newEntity)
         .returning('*');
 }
 
-exports.updateCurrency = (id, updateInfo) => {
+exports.update = (id, updateInfo) => {
     return db(tableNames.currency)
         .where({ id: id })
         .update(updateInfo)
@@ -31,7 +31,7 @@ exports.updateCurrency = (id, updateInfo) => {
         .returning('*');
 }
 
-exports.softDeleteCurrency = (id) => {
+exports.softDelete = (id) => {
     return db(tableNames.currency)
         .where({ id: id })
         .update({
