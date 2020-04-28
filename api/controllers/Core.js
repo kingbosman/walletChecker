@@ -12,9 +12,9 @@ const fsModelPath = './api/models/{{coin}}.js';
 const controllerFile = '../controllers/{{coin}}';
 const fsControllerPath = './api/controllers/{{coin}}.js';
 
-
+// TODO remove test
 exports.test = async(req, res) => {
-    const TestModel = require('../models/db/Access_checked');
+    const TestModel = require('../models/db/Acknowledged');
 
     try {
         const result = await TestModel.getActive();
