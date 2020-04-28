@@ -25,12 +25,16 @@ exports.updateAddressType = (id, updateInfo) => {
     return db(tableNames.address_type)
         .where({ id: id })
         .update(updateInfo)
+        .update({ updated_at: new Date() })
         .returning('*');
 }
 
 exports.softDeleteAddressType = (id) => {
     return db(tableNames.address_type)
         .where({ id: id })
-        .update({ deleted_at: new Date() })
+        .update({
+            deleted_at: new Date(),
+            updated_at: new Date()
+        })
         .returning('*');
 }

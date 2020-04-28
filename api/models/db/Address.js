@@ -1,8 +1,9 @@
 const { db, tableNames } = require('../../../db/knex');
 
-exports.getActiveAddresses = (filter = {}, offset = 0) => {
+exports.getActiveAddresses = (filter = {}, offset = 0, limit = 1000) => {
     return db.select(
             `${tableNames.address}.id`,
+            `${tableNames.address}.address`,
             `${tableNames.currency}.name as currency`,
             `${tableNames.currency}.abbreviation`,
             `${tableNames.currency}.decimal_places`,
@@ -16,7 +17,6 @@ exports.getActiveAddresses = (filter = {}, offset = 0) => {
             `${tableNames.balance}.final_transactions`,
             `${tableNames.balance}.sent`,
             `${tableNames.balance}.received`,
-            `${tableNames.address}.address`,
             `${tableNames.address}.created_at`,
             `${tableNames.address}.updated_at`,
         )
@@ -47,7 +47,7 @@ exports.getActiveAddresses = (filter = {}, offset = 0) => {
         })
         .where(filter)
         .whereNull(`${tableNames.address}.deleted_at`)
-        .limit(1000)
+        .limit(limit)
         .offset(offset)
 }
 
@@ -61,12 +61,16 @@ exports.updateAddress = (id, updateInfo) => {
     return db(tableNames.address)
         .where({ id: id })
         .update(updateInfo)
+        .update({ updated_at: new Date() })
         .returning('*');
 }
 
 exports.softDeleteAddress = (id) => {
     return db(tableNames.address)
         .where({ id: id })
-        .update({ deleted_at: new Date() })
+        .update({
+            deleted_at: new Date(),
+            updated_at: new Date()
+        })
         .returning('*');
 }

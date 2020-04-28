@@ -27,29 +27,16 @@ exports.updateCurrency = (id, updateInfo) => {
     return db(tableNames.currency)
         .where({ id: id })
         .update(updateInfo)
+        .update({ updated_at: new Date() })
         .returning('*');
 }
 
 exports.softDeleteCurrency = (id) => {
     return db(tableNames.currency)
         .where({ id: id })
-        .update({ deleted_at: new Date() })
-        .returning('*');
-}
-
-// TODO beneath is example, please remove
-exports.getActiveCurrencyOverview = (filter = {}, offset = 0) => {
-    return db.select(`${tableNames.currency}.abbreviation`,
-            `${tableNames.address}.address`)
-        .from(tableNames.currency)
-        .join(`${tableNames.address}`, function() {
-            this
-                .on(`${tableNames.currency}.id`,
-                    `${tableNames.address}.${tableNames.currency}_id`)
-                .onNull(`${tableNames.address}.deleted_at`)
+        .update({
+            deleted_at: new Date(),
+            updated_at: new Date()
         })
-        .where(filter)
-        .whereNull(`${tableNames.currency}.deleted_at`)
-        .limit(1000)
-        .offset(offset)
+        .returning('*');
 }

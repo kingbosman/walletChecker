@@ -25,12 +25,16 @@ exports.updateNetwork = (id, updateInfo) => {
     return db(tableNames.network)
         .where({ id: id })
         .update(updateInfo)
+        .update({ updated_at: new Date() })
         .returning('*');
 }
 
 exports.softDeleteNetwork = (id) => {
     return db(tableNames.network)
         .where({ id: id })
-        .update({ deleted_at: new Date() })
+        .update({
+            deleted_at: new Date(),
+            updated_at: new Date()
+        })
         .returning('*');
 }

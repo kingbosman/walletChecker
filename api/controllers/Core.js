@@ -14,10 +14,10 @@ const fsControllerPath = './api/controllers/{{coin}}.js';
 
 
 exports.test = async(req, res) => {
-    const TestModel = require('../models/db/Address');
+    const TestModel = require('../models/db/Transaction');
 
     try {
-        const result = await TestModel.getActiveAddresses();
+        const result = await TestModel.getActiveTransactions();
 
         res.json({
             result: result

@@ -27,12 +27,16 @@ exports.updatePerson = (id, updateInfo) => {
     return db(tableNames.person)
         .where({ id: id })
         .update(updateInfo)
+        .update({ updated_at: new Date() })
         .returning('*');
 }
 
 exports.softDeletePerson = (id) => {
     return db(tableNames.person)
         .where({ id: id })
-        .update({ deleted_at: new Date() })
+        .update({
+            deleted_at: new Date(),
+            updated_at: new Date()
+        })
         .returning('*');
 }

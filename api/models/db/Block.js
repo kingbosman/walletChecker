@@ -34,12 +34,16 @@ exports.updateBlock = (id, updateInfo) => {
     return db(tableNames.block)
         .where({ id: id })
         .update(updateInfo)
+        .update({ updated_at: new Date() })
         .returning('*');
 }
 
 exports.softDeleteBlock = (id) => {
     return db(tableNames.block)
         .where({ id: id })
-        .update({ deleted_at: new Date() })
+        .update({
+            deleted_at: new Date(),
+            updated_at: new Date()
+        })
         .returning('*');
 }
