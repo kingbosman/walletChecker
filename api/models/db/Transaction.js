@@ -1,4 +1,5 @@
 const { db, tableNames } = require('../../../db/knex');
+
 exports.getActiveTransactions = (filter = {}, offset = 0, limit = 1000) => {
     return db.select(
             `${tableNames.transaction}.id`,
